@@ -1,5 +1,5 @@
 // config.js
 const CONFIG = {
-  API_URL: 'https://script.google.com/macros/s/AKfycbxv7NXMripwvDs_QV-38h-Gp99Md0oFDnMZPVj1GoVA/dev', // Ganti dengan URL Web App
+  API_URL: 'https://script.google.com/macros/s/AKfycbxs2N4o6TqFanf-Ulhe_Wkr73XLimKfC3TN-UI0kNHWrwWxLW6op0uBvt26_dRB7rL9Bg/exec', // Ganti dengan URL Web App
   APP_NAME: 'Sistem TP KSSR'
 };
