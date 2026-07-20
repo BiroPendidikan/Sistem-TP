@@ -9,17 +9,23 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   document.getElementById('login-btn').addEventListener('click', async () => {
-    const username = document.getElementById('username').value;
-    const password = document.getElementById('password').value;
+    const username = document.getElementById('username').value.trim();
+    const password = document.getElementById('password').value.trim();
+    if (!username || !password) {
+      Swal.fire('Ralat', 'Sila isi username dan password', 'warning');
+      return;
+    }
     try {
       const res = await API.login(username, password);
       if (res.success) {
+        Swal.fire('Berjaya', 'Log masuk berjaya!', 'success');
         showMainApp();
       } else {
         Swal.fire('Gagal', res.message, 'error');
       }
-    } catch (e) {
-      Swal.fire('Ralat', e.message, 'error');
+    } catch (error) {
+      Swal.fire('Ralat', 'Tidak dapat menyambung ke pelayan. Semak sambungan internet.', 'error');
+      console.error(error);
     }
   });
 
@@ -72,29 +78,84 @@ document.addEventListener('DOMContentLoaded', () => {
       case 'analisis': loadAnalisis(); break;
       case 'laporan': loadLaporan(); break;
       case 'tetapan': loadTetapan(); break;
+      default: loadDashboard();
     }
   }
 
+  // ========== DEFINISI FUNGSI HALAMAN ==========
   async function loadDashboard() {
-    const res = await API.getDashboardStats();
-    const stats = res.stats;
-    document.getElementById('content-area').innerHTML = `
-      <h2 class="text-2xl font-bold mb-4">Dashboard</h2>
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div class="bg-white p-4 rounded-xl shadow"><p>Jumlah Murid</p><h3 class="text-3xl font-bold">${stats.totalMurid}</h3></div>
-        <div class="bg-white p-4 rounded-xl shadow"><p>Tahun 4</p><h3>${stats.tahun4}</h3></div>
-        <div class="bg-white p-4 rounded-xl shadow"><p>Tahun 5</p><h3>${stats.tahun5}</h3></div>
-        <div class="bg-white p-4 rounded-xl shadow"><p>Tahun 6</p><h3>${stats.tahun6}</h3></div>
-        <!-- Tambah lebih banyak kad dan carta menggunakan Chart.js -->
-      </div>
-    `;
-    // Carta akan ditambah di sini menggunakan Chart.js
+    const content = document.getElementById('content-area');
+    content.innerHTML = `<h2 class="text-2xl font-bold mb-4">Dashboard</h2><p>Memuatkan...</p>`;
+    try {
+      const res = await API.getDashboardStats();
+      const stats = res.stats;
+      content.innerHTML = `
+        <h2 class="text-2xl font-bold mb-4">Dashboard</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+          <div class="bg-white p-4 rounded-xl shadow"><p class="text-gray-500">Jumlah Murid</p><h3 class="text-3xl font-bold">${stats.totalMurid}</h3></div>
+          <div class="bg-white p-4 rounded-xl shadow"><p class="text-gray-500">Tahun 4</p><h3 class="text-2xl">${stats.tahun4}</h3></div>
+          <div class="bg-white p-4 rounded-xl shadow"><p class="text-gray-500">Tahun 5</p><h3 class="text-2xl">${stats.tahun5}</h3></div>
+          <div class="bg-white p-4 rounded-xl shadow"><p class="text-gray-500">Tahun 6</p><h3 class="text-2xl">${stats.tahun6}</h3></div>
+          <div class="bg-white p-4 rounded-xl shadow"><p class="text-gray-500">Lelaki</p><h3 class="text-2xl">${stats.lelaki}</h3></div>
+          <div class="bg-white p-4 rounded-xl shadow"><p class="text-gray-500">Perempuan</p><h3 class="text-2xl">${stats.perempuan}</h3></div>
+          <div class="bg-white p-4 rounded-xl shadow"><p class="text-gray-500">Purata TP Keseluruhan</p><h3 class="text-2xl">${stats.avgTP}</h3></div>
+          <div class="bg-white p-4 rounded-xl shadow"><p class="text-gray-500">Kemaskini Terakhir</p><h3 class="text-sm">${stats.lastUpdate || '-'}</h3><p class="text-xs text-gray-400">${stats.lastDate || '-'}</p></div>
+        </div>
+        <p class="text-gray-500">Carta akan ditambah kemudian.</p>
+      `;
+    } catch (err) {
+      content.innerHTML = `<p class="text-red-500">Gagal memuat dashboard: ${err.message}</p>`;
+    }
   }
 
-  // Fungsi loadMurid, loadTPPage, dan lain-lain perlu dibangunkan dengan antaramuka penuh (Jadual, butang CRUD, SweetAlert, dll.)
-  // Sertakan contoh untuk loadMurid:
   function loadMurid() {
-    // ...
+    const content = document.getElementById('content-area');
+    content.innerHTML = `
+      <h2 class="text-2xl font-bold mb-4">Senarai Murid</h2>
+      <div class="bg-white p-4 rounded-xl shadow">
+        <p class="text-gray-500">Fungsi carian dan senarai murid akan datang.</p>
+        <button class="mt-2 bg-blue-500 text-white px-4 py-2 rounded" onclick="alert('Fungsi tambah murid belum tersedia')">Tambah Murid</button>
+      </div>
+    `;
   }
-  // Dan seterusnya.
+
+  function loadTPPage() {
+    const content = document.getElementById('content-area');
+    content.innerHTML = `
+      <h2 class="text-2xl font-bold mb-4">Kemaskini Tahap Penguasaan</h2>
+      <div class="bg-white p-4 rounded-xl shadow">
+        <p class="text-gray-500">Antara muka kemaskini TP akan datang.</p>
+      </div>
+    `;
+  }
+
+  function loadAnalisis() {
+    const content = document.getElementById('content-area');
+    content.innerHTML = `
+      <h2 class="text-2xl font-bold mb-4">Analisis</h2>
+      <div class="bg-white p-4 rounded-xl shadow">
+        <p class="text-gray-500">Carta dan analisis terperinci akan dipaparkan di sini.</p>
+      </div>
+    `;
+  }
+
+  function loadLaporan() {
+    const content = document.getElementById('content-area');
+    content.innerHTML = `
+      <h2 class="text-2xl font-bold mb-4">Laporan</h2>
+      <div class="bg-white p-4 rounded-xl shadow">
+        <p class="text-gray-500">Penjanaan laporan PDF/Excel akan datang.</p>
+      </div>
+    `;
+  }
+
+  function loadTetapan() {
+    const content = document.getElementById('content-area');
+    content.innerHTML = `
+      <h2 class="text-2xl font-bold mb-4">Tetapan</h2>
+      <div class="bg-white p-4 rounded-xl shadow">
+        <p class="text-gray-500">Konfigurasi nama sekolah, logo, dan tema akan datang.</p>
+      </div>
+    `;
+  }
 });
